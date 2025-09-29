@@ -2,14 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/LibraryBookManager/CopilotIndices/17.14.995.13737/CodeChunks.db-shm
-/.vs/LibraryBookManager/CopilotIndices/17.14.995.13737/CodeChunks.db-wal
-/.vs/LibraryBookManager/CopilotIndices/17.14.995.13737/SemanticSymbols.db-shm
-/.vs/LibraryBookManager/CopilotIndices/17.14.995.13737/SemanticSymbols.db-wal
-/.vs/LibraryBookManager/FileContentIndex/1337f594-165f-4d9e-9750-ba8482ed326f.vsidx
-/.vs/LibraryBookManager/FileContentIndex/374dd40f-713d-4562-bac6-4437ffab30a0.vsidx
-/.vs/LibraryBookManager/FileContentIndex/5c2de744-9501-4700-a041-a54ff25484c5.vsidx
-*.vsidx
-/.vs/LibraryBookManager/v17/.suo
-/.vs/LibraryBookManager/v17/DocumentLayout.backup.json
-/.vs/LibraryBookManager/v17/DocumentLayout.json
+bin/
+obj/
+.vs/
