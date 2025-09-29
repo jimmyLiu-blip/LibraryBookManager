@@ -1,6 +1,0 @@
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\bin\Debug\Domain.dll
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\bin\Debug\Domain.pdb
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\obj\Debug\Domain.csproj.AssemblyReference.cache
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\obj\Debug\Domain.csproj.CoreCompileInputs.cache
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\obj\Debug\Domain.dll
-C:\Users\a0978\source\repos\LibraryBookManager\Domain\obj\Debug\Domain.pdb

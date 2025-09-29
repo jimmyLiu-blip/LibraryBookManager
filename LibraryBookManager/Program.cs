@@ -1,6 +1,7 @@
 ﻿using Repository;
 using Services;
 using System;
+using System.Linq;
 
 namespace LibraryBookManager
 {
@@ -19,6 +20,7 @@ namespace LibraryBookManager
                     Console.WriteLine("   ===歡迎使用小型圖書管理系統===   ");
                     Showmenu();
                     string choice = Console.ReadLine();
+                    Console.Clear();
 
                     switch (choice)
                     {
@@ -29,18 +31,25 @@ namespace LibraryBookManager
                             FindBooks();
                             break;
                         case "3":
-                            //UpdateQuantity();
+                            UpdateQuantity();
                             break;
                         case "4":
                             DeleteBook();
                             break;
                         case "5":
+                            ShowAllBooks();
+                            break;
+                        case "6":
                             exit = true;
                             break;
                         default:
                             Console.WriteLine("輸入錯誤，請按任意鍵離開");
                             break;
-
+                    }
+                    if (!exit)
+                    {
+                        Console.WriteLine("按任意鍵回到目錄頁面");
+                        Console.ReadLine();
                     }
                 }
                 catch (InvalidOperationException ex)
@@ -60,45 +69,52 @@ namespace LibraryBookManager
             Console.WriteLine("輸入2，查詢書籍");
             Console.WriteLine("輸入3，修改書籍數量");
             Console.WriteLine("輸入4，刪除書籍");
-            Console.WriteLine("輸入5，離開");
-            Console.WriteLine("請輸入數字1~5：");
+            Console.WriteLine("輸入5，所有書籍清單");
+            Console.WriteLine("輸入6，離開");
+            Console.Write("請輸入數字1~6：");
         }
 
         private static void AddBook()
         {
-            Console.Clear();
             Console.WriteLine("===新增書籍===");
 
-            Console.Write("請輸入書籍的書名：");
-            string title = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                Console.WriteLine("不可沒有輸入書名");
-                return;
-            }
-
-            Console.Write("請輸入書籍的作者：");
-            string author = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(author))
-            {
-                Console.WriteLine("不可沒有輸入作者");
-                return;
-            }
-
-            Console.Write("請輸入書籍的ISBN：");
-            string isbn = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(isbn))
-            {
-                Console.WriteLine("不可沒有輸入ISBN");
-                return;
-            }
-
+            string title;
+            string author;
+            string isbn;
             int quantity;
-            while(true)
+
+            while (true)
             {
+                Console.Write("請輸入書籍的書名：");
+                var input1 = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input1))
+                {
+                    Console.WriteLine("不可沒有輸入書名");
+                    continue;
+                }
+                title = input1;
+
+                Console.Write("請輸入書籍的作者：");
+                var input2 = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input2))
+                {
+                    Console.WriteLine("不可沒有輸入作者");
+                    continue;
+                }
+                author = input2;
+
+                Console.Write("請輸入書籍的ISBN：");
+                string input3 = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input3))
+                {
+                    Console.WriteLine("不可沒有輸入ISBN");
+                    continue;
+                }
+                isbn = input3;
+                
                 Console.Write("請輸入書籍的數量：");
-                string input = Console.ReadLine();
-                if (!int.TryParse(input, out quantity))
+                string input4 = Console.ReadLine();
+                if (!int.TryParse(input4, out quantity))
                 {
                     Console.WriteLine($"輸入錯誤，請輸入正確的數字");
                     continue;
@@ -113,14 +129,11 @@ namespace LibraryBookManager
 
             _bookService.AddBook(title, author, isbn, quantity);
 
-            Console.WriteLine($"新增書籍成功，加入書名：{title}，作者：{author}，ISBN：{isbn}，數量：{quantity}");
-            Console.WriteLine("按任意鍵回到目錄頁面");
-            Console.ReadLine();
+            Console.WriteLine($"新增書籍成功，加入書名：{title,-20}，作者：{author,-10}，ISBN：{isbn,-10}，數量：{quantity,3}");
         }
 
         private static void DeleteBook()
         {
-            Console.Clear();
             Console.WriteLine("===刪除書籍===");
 
             string isbn;
@@ -138,13 +151,10 @@ namespace LibraryBookManager
 
             _bookService.DeleteBook(isbn);
             Console.WriteLine($"成功刪除ISBN為{isbn}的書籍");
-            Console.WriteLine("按任意鍵回到目錄頁面");
-            Console.ReadLine();
         }
 
         private static void FindBooks()
         {
-            Console.Clear();
             Console.WriteLine("尋找書籍");
 
             string isbn;
@@ -167,26 +177,35 @@ namespace LibraryBookManager
 
             var allBooks = _bookService.FindBooks(isbn, title);
 
-            Console.WriteLine($"尋找到的書籍為{allBooks}");
-            Console.WriteLine("按任意鍵回到目錄頁面");
-            Console.ReadLine();
+            if (!allBooks.Any())
+            {
+                Console.WriteLine("沒有找到符合條件的書籍");
+            }
+            else
+            {
+                Console.WriteLine("找到以下的書籍：");
+                foreach (var book in allBooks)
+                {
+                    Console.WriteLine(book);
+                }
+            }
         }
 
         private static void UpdateQuantity()
         { 
-            Console.Clear();
-            Console.WriteLine("修改書籍數量");
+            Console.WriteLine("===修改書籍數量===");
 
             Console.Write("請輸入想要修改書籍數量的ISBN碼：");
             string isbn;
             while (true)
             { 
-                isbn = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(isbn))
+                var input = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input))
                 {
                     Console.Write("ISBN碼不得沒有輸入，");
                     continue;
                 }
+                isbn = input;
                 break;
             }
 
@@ -200,11 +219,6 @@ namespace LibraryBookManager
                     Console.Write("輸入錯誤，請重新輸入數字，");
                     continue;
                 }
-                if (string.IsNullOrWhiteSpace(isbn))
-                {
-                    Console.Write("數量不得沒有輸入，");
-                    continue;
-                }
                 if (quantity < 0)
                 {
                     Console.Write("數量不得為負數，");
@@ -215,8 +229,18 @@ namespace LibraryBookManager
 
             _bookService.UpdateQuantity(isbn, quantity);
             Console.WriteLine($"更新ISBN：{isbn}的數量：{quantity}");
-            Console.WriteLine("按任意鍵回到目錄頁面");
-            Console.ReadLine();
+        }
+
+        private static void ShowAllBooks()
+        {
+            Console.WriteLine("===所有書籍清單===");
+
+            var allBooks = _bookService.GetAllBooks();
+
+            foreach ( var book in allBooks )
+            {
+                Console.WriteLine(book);
+            }
         }
     }
 }

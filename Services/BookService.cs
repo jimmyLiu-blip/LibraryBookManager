@@ -36,7 +36,7 @@ namespace Services
 
             if (quantity < 0)
             {
-                throw new ArgumentException(nameof(quantity),"書本數量不可以 <= 0");
+                throw new ArgumentException("書本數量不可以 <= 0",nameof(quantity));
             }
         }
 
@@ -51,7 +51,7 @@ namespace Services
                 .FirstOrDefault(b => string.Equals(b.ISBN, isbn, StringComparison.OrdinalIgnoreCase));
         }
 
-        private List<Book> GetAllBooks()
+        public  List<Book> GetAllBooks()
         {
             return _bookRepository.GetAllBooksFromList();
         }
@@ -84,7 +84,7 @@ namespace Services
 
             if (!string.IsNullOrWhiteSpace(isbn))
             {
-                result = result.Where(b => b.ISBN.ToLower().Contains(isbn.ToLower()));
+                result = result.Where(b => b.ISBN.ToLower().Equals(isbn.ToLower()));
             }
 
             if (!string.IsNullOrWhiteSpace(title))
@@ -104,7 +104,7 @@ namespace Services
 
             if (quantity < 0)
             {
-                throw new ArgumentException(nameof(quantity),"書本數量不可以 <= 0");
+                throw new ArgumentException("書本數量不可以 <= 0",nameof(quantity));
             }
             
             var book = GetBookByISBN(isbn);

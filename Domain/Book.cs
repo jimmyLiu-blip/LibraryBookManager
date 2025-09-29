@@ -14,5 +14,26 @@
             ISBN = isbn;
             Quantity = quantity;
         }
+
+        public override string ToString()
+        {
+            return $"書名：{PadRightMix(Title,20)} 作者：{PadRightMix(Author,16)} ISBN：{ISBN,-12} 數量：{Quantity,3}";
+        }
+
+        private string PadRightMix(string input, int totalLength)
+        {
+            int realLength = 0;
+            foreach (var c in input)
+            {
+                realLength += c > 127 ? 2 : 1;
+            }
+
+            int padding = totalLength - realLength;
+            if (padding > 0)
+            {
+                return input + new string(' ', padding);
+            }
+            return input;
+        }
     }
 }
