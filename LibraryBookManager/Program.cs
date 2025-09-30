@@ -86,35 +86,35 @@ namespace LibraryBookManager
             while (true)
             {
                 Console.Write("請輸入書籍的書名：");
-                var input1 = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(input1))
+                var inputTitle = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputTitle))
                 {
                     Console.WriteLine("不可沒有輸入書名");
                     continue;
                 }
-                title = input1;
+                title = inputTitle;
 
                 Console.Write("請輸入書籍的作者：");
-                var input2 = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(input2))
+                var inputAuthor = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputAuthor))
                 {
                     Console.WriteLine("不可沒有輸入作者");
                     continue;
                 }
-                author = input2;
+                author = inputAuthor;
 
                 Console.Write("請輸入書籍的ISBN：");
-                string input3 = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(input3))
+                string inputISBN = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputISBN))
                 {
                     Console.WriteLine("不可沒有輸入ISBN");
                     continue;
                 }
-                isbn = input3;
+                isbn = inputISBN;
                 
                 Console.Write("請輸入書籍的數量：");
-                string input4 = Console.ReadLine();
-                if (!int.TryParse(input4, out quantity))
+                string inputQuantity = Console.ReadLine();
+                if (!int.TryParse(inputQuantity, out quantity))
                 {
                     Console.WriteLine($"輸入錯誤，請輸入正確的數字");
                     continue;

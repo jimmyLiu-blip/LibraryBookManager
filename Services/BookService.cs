@@ -40,7 +40,7 @@ namespace Services
             }
         }
 
-        private Book GetBookByISBN(string isbn)
+        public  Book GetBookByISBN(string isbn)
         {
             if (string.IsNullOrWhiteSpace(isbn))
             { 
@@ -125,8 +125,6 @@ namespace Services
                 throw new ArgumentNullException(nameof(isbn), "ISBN不可為空");
             }
 
-            var allBooks = GetAllBooks();
-
             var book = GetBookByISBN(isbn);
 
             if (book == null)
@@ -134,7 +132,7 @@ namespace Services
                 throw new InvalidOperationException($"此{isbn}書籍不存在清單列表中，無法刪除");
             }
 
-            allBooks.Remove(book);
+            _bookRepository.DeleteBookFromList(book);
         }
     }
 }

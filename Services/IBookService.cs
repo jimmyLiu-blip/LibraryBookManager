@@ -9,6 +9,7 @@ namespace Services
 {
     public interface IBookService
     {
+        List<Book> GetAllBooks();
         void AddBook(string title, string author, string isbn, int quantity);
 
         List<Book> FindBooks(string isbn, string title);

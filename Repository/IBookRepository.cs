@@ -13,5 +13,7 @@ namespace Repository
 
         List<Book> GetAllBooksFromList();
 
+        void DeleteBookFromList(Book book);
+
     }
 }

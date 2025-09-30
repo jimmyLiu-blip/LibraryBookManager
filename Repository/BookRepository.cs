@@ -33,5 +33,10 @@ namespace Repository
         {
             return _bookList;
         }
+
+        public void DeleteBookFromList(Book book)
+        { 
+            _bookList.Remove(book);
+        }
     }
 }
