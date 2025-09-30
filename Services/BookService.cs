@@ -17,7 +17,7 @@ namespace Services
             _bookRepository = bookRepository;
         }
 
-        private void ValidateBookParameters(string title, string author, string isbn, int quantity)
+        private void ValidateBookParameters(string title, string author, string isbn, int quantity, int availableQuantity)
         {
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -56,7 +56,7 @@ namespace Services
             return _bookRepository.GetAllBooksFromList();
         }
 
-        public void AddBook(string title, string author, string isbn, int quantity)
+        public void AddBook(string title, string author, string isbn, int quantity, int availableQuantity)
         {
             ValidateBookParameters(title, author, isbn, quantity);
 
@@ -65,7 +65,7 @@ namespace Services
                 throw new InvalidOperationException($"此{isbn}書籍已存在列表清單中");
             }
 
-            var newBook = new Book(title, author, isbn, quantity);
+            var newBook = new Book(title, author, isbn, quantity, availableQuantity);
 
             _bookRepository.AddBookToList(newBook);
 

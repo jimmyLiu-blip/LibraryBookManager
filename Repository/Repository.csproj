@@ -43,6 +43,9 @@
   <ItemGroup>
     <Compile Include="BookRepository.cs" />
     <Compile Include="IBookRepository.cs" />
+    <Compile Include="IBorrowRecordRepository.cs" />
+    <Compile Include="IMemberRepository.cs" />
+    <Compile Include="MemberRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

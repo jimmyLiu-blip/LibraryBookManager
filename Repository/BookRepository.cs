@@ -15,13 +15,13 @@ namespace Repository
         {
             _bookList = new List<Book>();
 
-            _bookList.Add(new Book("航海王1", "尾田榮一郎", "123456788", 5));
+            _bookList.Add(new Book("航海王1", "尾田榮一郎", "123456788", 5, 5));
 
-            _bookList.Add(new Book("航海王2", "尾田榮一郎", "123456789", 2));
+            _bookList.Add(new Book("航海王2", "尾田榮一郎", "123456789", 2, 2));
 
-            _bookList.Add(new Book("火影忍者72", "岸本齊史", "987654321", 1));
+            _bookList.Add(new Book("火影忍者72", "岸本齊史", "987654321", 1, 1));
 
-            _bookList.Add(new Book("火影忍者71", "岸本齊史", "987654320", 1));
+            _bookList.Add(new Book("火影忍者71", "岸本齊史", "987654320", 1, 1));
         }
 
         public void AddBookToList(Book book)

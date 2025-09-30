@@ -6,18 +6,20 @@
         public string Author { get; set; }
         public string ISBN { get; set; }
         public int Quantity { get; set; }
+        public int AvailableQuantity {  get; set; }
 
-        public Book(string title, string author, string isbn, int quantity)
+        public Book(string title, string author, string isbn, int quantity,int availableQuantity)
         {
             Title = title;
             Author = author;
             ISBN = isbn;
             Quantity = quantity;
+            AvailableQuantity = quantity;
         }
 
         public override string ToString()
         {
-            return $"書名：{PadRightMix(Title,20)} 作者：{PadRightMix(Author,16)} ISBN：{ISBN,-12} 數量：{Quantity,3}";
+            return $"書名：{PadRightMix(Title,20)} 作者：{PadRightMix(Author,16)} ISBN：{ISBN,-12} 總數量：{Quantity,3} 可借數量：{AvailableQuantity,3}";
         }
 
         private string PadRightMix(string input, int totalLength)
