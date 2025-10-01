@@ -46,19 +46,19 @@ namespace LibraryBookManager
                             RegisterMember();
                             break;
                         case "7":
-                            //DeleteMember();
+                            DeleteMember();
                             break;
                         case "8":
-                            //UpgradeMembership();
+                            UpgradeMembership();
                             break;
                         case "9":
-                            //GetAllMembers();
+                            GetAllMembers();
                             break;
                         case "10":
-                            //GetMember();
+                            GetMember();
                             break;
                         case "11":
-                            //BorrowBook();
+                            BorrowBook();
                             break;
                         case "12":
                             //ReturnBook();
@@ -321,21 +321,22 @@ namespace LibraryBookManager
                 Console.WriteLine("2.一般會員(可借5本)");
                 Console.WriteLine("3.高級會員(可借10本)");
                 Console.Write("請輸入選項(1~3)：");
-                var inpurMemberType = Console.ReadLine();
+                var inputMemberType = Console.ReadLine();
 
-                if (inpurMemberType == "1")
+                if (inputMemberType == "1")
                 {
                     memberType = MemberType.NonMember;
                     break;
                 }
-                else if (inpurMemberType == "2")
+                else if (inputMemberType == "2")
                 {
                     memberType = MemberType.Regular;
                     break;
                 }
-                else if (inpurMemberType == "3")
+                else if (inputMemberType == "3")
                 {
                     memberType = MemberType.Premium;
+                    break;
                 }
                 else
                 {
@@ -344,6 +345,7 @@ namespace LibraryBookManager
                 }
             }
             _memberService.RegisterMember(memberId, name, memberType);
+            Console.Clear();
             Console.WriteLine($"註冊會員成功!!會員ID：{memberId}，會員姓名：{name}，會員類型:{GetMemberTypeText(memberType)}");
         }
 
@@ -360,6 +362,210 @@ namespace LibraryBookManager
                 default:
                     return "未知類型";
             }
+        }
+
+        private static void DeleteMember()
+        {
+            Console.WriteLine("===註銷會員===");
+
+            string memberId;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可以沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+                break;
+            }
+            var member = _memberService.GetMember(memberId);
+            if (member == null)
+            {
+                Console.WriteLine($"此會員ID：{memberId}不存在");
+                return;
+            }
+            _memberService.DeleteMember(memberId);
+
+            Console.Clear();
+            Console.WriteLine($"註銷會員成功，已註銷會員ID為：{memberId}");
+        }
+
+        private static void UpgradeMembership()
+        {
+            Console.WriteLine("===更新會員===");
+
+            string memberId;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine($"不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+                break ;
+            }
+            var member = _memberService.GetMember(memberId);
+            if (member == null)
+            {
+                Console.WriteLine($"此會員ID：{memberId}不存在");
+                return;
+            }
+
+            Console.WriteLine($"目前的會員ID：{memberId}，目前類型：{GetMemberTypeText(member.MemberType)}");
+            Console.WriteLine("請選擇新的會員類型：");
+            Console.WriteLine("1.非會員(可借2本書)");
+            Console.WriteLine("2 一般會員(可借5本書)");
+            Console.WriteLine("3 高級會員(可借10本書)");
+            Console.Write("請輸入選項(1~3)：");
+
+            MemberType newMemberType;
+            string inputMemberType;
+
+            while (true)
+            {
+                inputMemberType = Console.ReadLine();
+                if (inputMemberType == "1")
+                {
+                    newMemberType = MemberType.NonMember;
+                    break;
+                }
+                else if (inputMemberType == "2")
+                {
+                    newMemberType = MemberType.Regular;
+                    break;
+                }
+                else if (inputMemberType == "3")
+                {
+                    newMemberType = MemberType.Premium;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("輸入未知類型，請重新輸入");
+                    Console.Write("請重新輸入選項(1~3)：");
+                    continue;
+                }
+            }
+
+            if (member.MemberType == newMemberType)
+            {
+                Console.WriteLine($"會員類型未變動，目前已是{GetMemberTypeText(newMemberType)}");
+                return;
+            }
+
+            _memberService.UpgradeMembership(memberId, newMemberType);
+            Console.Clear();
+            Console.WriteLine($"會員更新成功!!會員ID：{memberId}，新會員類型：{GetMemberTypeText(newMemberType)}");
+        }
+
+        private static void GetAllMembers()
+        {
+            Console.WriteLine("===取得所有會員===");
+
+            var allMembers = _memberService.GetAllMembers();
+            if (allMembers == null || !allMembers.Any())
+            {
+                Console.WriteLine("目前無任何會員存在");
+                return;
+            }
+            foreach (var member in allMembers)
+            {
+                Console.WriteLine($"會員ID：{member.MemberId}，會員姓名：{member.Name}，會員類型：{GetMemberTypeText(member.MemberType)}，目前借閱數：{member.CurrentBorrowCount}/{member.MaxBorrowLimit}");
+            }
+        
+        }
+
+        private static void GetMember()
+        {
+            Console.WriteLine("===取得會員資料===");
+
+            string memberId;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+                break;
+            }
+
+            var member = _memberService.GetMember(memberId);
+            if (member == null)
+            {
+                Console.WriteLine($"此會員ID：{memberId}不存在");
+                return ;
+            }
+            Console.Clear();
+            Console.WriteLine($"會員ID：{memberId}，會員姓名：{member.Name}，會員類型：{GetMemberTypeText(member.MemberType)}，借閱數：{member.CurrentBorrowCount}/{member.MaxBorrowLimit}");
+        }
+
+        private static void BorrowBook()
+        {
+            Console.WriteLine("===借書服務===");
+
+            string memberId;
+            string isbn;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員Id");
+                    continue;
+                }
+                memberId = inputmemberId;
+
+                Console.Write("請輸入要借閱書籍的ISBN：");
+                var inputisbn = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputisbn))
+                {
+                    Console.WriteLine("不可沒有輸入借閱書籍的ISBN");
+                    continue;
+                }
+                isbn = inputisbn;
+                break;
+            }
+            var member = _memberService.GetMember(memberId);
+            if (member == null)
+            {
+                Console.WriteLine($"不存在此會員ID：{memberId}");
+                return;
+            }
+            var book = _bookService.GetBookByISBN(isbn);
+            if (book == null)
+            {
+                Console.WriteLine($"此書籍ISBN：{isbn}不存在");
+                return;
+            }
+            if (book.AvailableQuantity <= 0)
+            {
+                Console.WriteLine($"此書籍ISBN：{isbn}目前沒有庫存可以出借");
+                return;
+            }
+            if (!member.CanBorrow(1))
+            {
+                Console.WriteLine($"此會員：{member.Name}已達可借閱上限");
+                return;
+            }
+
+            _borrowService.BorrowBook(memberId, isbn);
+            Console.WriteLine($"借閱書籍成功!會員姓名：{member.Name},成功借閱書籍：{book.Title},ISBN：{isbn}");
+
         }
     }
 }
