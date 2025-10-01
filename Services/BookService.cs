@@ -11,13 +11,15 @@ namespace Services
     public class BookService:IBookService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly IMemberRepository _memberRepository;
+        private readonly IBorrowRecordRepository _borrowRecordRepository;
 
         public BookService(IBookRepository bookRepository)
         {
-            _bookRepository = bookRepository;
+            _bookRepository = bookRepository ??　throw new ArgumentNullException(nameof(bookRepository));
         }
 
-        private void ValidateBookParameters(string title, string author, string isbn, int quantity, int availableQuantity)
+        private void ValidateBookParameters(string title, string author, string isbn, int quantity)
         {
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -40,7 +42,7 @@ namespace Services
             }
         }
 
-        public  Book GetBookByISBN(string isbn)
+        public Book GetBookByISBN(string isbn)
         {
             if (string.IsNullOrWhiteSpace(isbn))
             { 
@@ -56,7 +58,7 @@ namespace Services
             return _bookRepository.GetAllBooksFromList();
         }
 
-        public void AddBook(string title, string author, string isbn, int quantity, int availableQuantity)
+        public void AddBook(string title, string author, string isbn, int quantity)
         {
             ValidateBookParameters(title, author, isbn, quantity);
 
@@ -65,7 +67,7 @@ namespace Services
                 throw new InvalidOperationException($"此{isbn}書籍已存在列表清單中");
             }
 
-            var newBook = new Book(title, author, isbn, quantity, availableQuantity);
+            var newBook = new Book(title, author, isbn, quantity);
 
             _bookRepository.AddBookToList(newBook);
 

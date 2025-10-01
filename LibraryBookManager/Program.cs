@@ -1,4 +1,5 @@
-﻿using Repository;
+﻿using Domain;
+using Repository;
 using Services;
 using System;
 using System.Linq;
@@ -8,6 +9,8 @@ namespace LibraryBookManager
     public class Program
     {
         private static BookService _bookService = new BookService(new BookRepository());
+        private static MemberService _memberService = new MemberService(new MemberRepository());
+        private static BorrowService _borrowService = new BorrowService(new BookRepository(), new MemberRepository(), new BorrowRecordRepository());
         static void Main(string[] args)
         {
             bool exit = false;
@@ -40,6 +43,33 @@ namespace LibraryBookManager
                             ShowAllBooks();
                             break;
                         case "6":
+                            RegisterMember();
+                            break;
+                        case "7":
+                            //DeleteMember();
+                            break;
+                        case "8":
+                            //UpgradeMembership();
+                            break;
+                        case "9":
+                            //GetAllMembers();
+                            break;
+                        case "10":
+                            //GetMember();
+                            break;
+                        case "11":
+                            //BorrowBook();
+                            break;
+                        case "12":
+                            //ReturnBook();
+                            break;
+                        case "13":
+                            //GetMemberBorrowHistory();
+                            break;
+                        case "14":
+                            //GetActiveBorrows();
+                            break;
+                        case "15":
                             exit = true;
                             break;
                         default:
@@ -55,23 +85,39 @@ namespace LibraryBookManager
                 catch (InvalidOperationException ex)
                 {
                     Console.WriteLine($"出現操作錯誤{ex.Message}");
+                    Console.WriteLine("按任意鍵回到目錄頁面");
+                    Console.ReadLine();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"出現異常錯誤{ex.Message}");
+                    Console.WriteLine("按任意鍵回到目錄頁面");
+                    Console.ReadLine();
                 }
             }
         }
 
         private static void Showmenu()
         {
-            Console.WriteLine("輸入1，新增書籍");
-            Console.WriteLine("輸入2，查詢書籍");
-            Console.WriteLine("輸入3，修改書籍數量");
-            Console.WriteLine("輸入4，刪除書籍");
-            Console.WriteLine("輸入5，所有書籍清單");
-            Console.WriteLine("輸入6，離開");
-            Console.Write("請輸入數字1~6：");
+            Console.WriteLine("輸入 1，新增書籍");
+            Console.WriteLine("輸入 2，查詢書籍");
+            Console.WriteLine("輸入 3，修改書籍數量");
+            Console.WriteLine("輸入 4，刪除書籍");
+            Console.WriteLine("輸入 5，所有書籍清單");
+            Console.WriteLine("===============================");
+            Console.WriteLine("輸入 6，註冊會員");
+            Console.WriteLine("輸入 7，註銷會員");
+            Console.WriteLine("輸入 8，更新會員");
+            Console.WriteLine("輸入 9，顯示所有會員");
+            Console.WriteLine("輸入10，取得會員資料");
+            Console.WriteLine("===============================");
+            Console.WriteLine("輸入11，借書服務");
+            Console.WriteLine("輸入12，還書服務");
+            Console.WriteLine("輸入13，取得會員借書紀錄");
+            Console.WriteLine("輸入14，取得會員尚未歸還書籍的紀錄");
+            Console.WriteLine("===============================");
+            Console.WriteLine("輸入15，離開");
+            Console.Write("請輸入數字1~15：");
         }
 
         private static void AddBook()
@@ -129,7 +175,7 @@ namespace LibraryBookManager
 
             _bookService.AddBook(title, author, isbn, quantity);
 
-            Console.WriteLine($"新增書籍成功，加入書名：{title,-20}，作者：{author,-10}，ISBN：{isbn,-10}，數量：{quantity,3}");
+            Console.WriteLine($"新增書籍成功，加入書名：{title,-20}，作者：{author,-10}，ISBN：{isbn,-10}，庫存總數量：{quantity,3}，可借數量：{quantity,3}");
         }
 
         private static void DeleteBook()
@@ -240,6 +286,79 @@ namespace LibraryBookManager
             foreach ( var book in allBooks )
             {
                 Console.WriteLine(book);
+            }
+        }
+        private static void RegisterMember()
+        {
+            Console.WriteLine("===註冊新會員===");
+
+            string memberId;
+            string name;
+            MemberType memberType;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrEmpty(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+
+                Console.Write("請輸入你的名字：");
+                var inputname = Console.ReadLine();
+                if (string.IsNullOrEmpty(inputname))
+                {
+                    Console.WriteLine("不可沒有輸入姓名");
+                    continue;
+                }
+                name = inputname;
+
+                Console.WriteLine("請選擇會員類型");
+                Console.WriteLine("1.非會員(可借2本)");
+                Console.WriteLine("2.一般會員(可借5本)");
+                Console.WriteLine("3.高級會員(可借10本)");
+                Console.Write("請輸入選項(1~3)：");
+                var inpurMemberType = Console.ReadLine();
+
+                if (inpurMemberType == "1")
+                {
+                    memberType = MemberType.NonMember;
+                    break;
+                }
+                else if (inpurMemberType == "2")
+                {
+                    memberType = MemberType.Regular;
+                    break;
+                }
+                else if (inpurMemberType == "3")
+                {
+                    memberType = MemberType.Premium;
+                }
+                else
+                {
+                    Console.WriteLine("輸入錯誤，請重新輸入");
+                    continue;
+                }
+            }
+            _memberService.RegisterMember(memberId, name, memberType);
+            Console.WriteLine($"註冊會員成功!!會員ID：{memberId}，會員姓名：{name}，會員類型:{GetMemberTypeText(memberType)}");
+        }
+
+        private static string GetMemberTypeText(MemberType type)
+        {
+            switch (type)
+            { 
+                case MemberType.NonMember:
+                    return "非會員";
+                case MemberType.Regular:
+                    return "一般會員";
+                case MemberType.Premium:
+                    return "高級會員";
+                default:
+                    return "未知類型";
             }
         }
     }

@@ -8,8 +8,9 @@ namespace Repository
         void AddRecord(BorrowRecord record);
         List<BorrowRecord> GetRecordsByMemberId(string memberId);
         List<BorrowRecord> GetRecordsByISBN(string isbn);
-        List<BorrowRecord> GetActiveRecords();
+        List<BorrowRecord> GetRecord();
         void UpdateRecord(BorrowRecord record);
         void DeleteRecord(BorrowRecord record);
+        BorrowRecord GetRecordById(string recordid);
     }
 }

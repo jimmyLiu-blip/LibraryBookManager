@@ -43,5 +43,14 @@ namespace Repository
             }
         }
 
+        public void DeleteMember(string memberId)
+        {
+            var existing = GetMemberById(memberId);
+            if (existing != null)
+            {
+                _members.Remove(existing);
+            }
+        }
+
     }
 }

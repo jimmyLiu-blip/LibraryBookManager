@@ -11,9 +11,9 @@ namespace Domain
         public DateTime? ReturnDate { get; set; }
         public bool IsReturned { get; set; }
 
-        public BorrowRecord(string recordId, string memberId, string isbn)
+        public BorrowRecord(string memberId, string isbn)
         { 
-            RecordId = recordId;
+            RecordId = Guid.NewGuid().ToString();
             MemberId = memberId;
             ISBN = isbn;
             BorrowDate = DateTime.Now;

@@ -42,7 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BookService.cs" />
+    <Compile Include="BorrowService.cs" />
     <Compile Include="IBookService.cs" />
+    <Compile Include="IBorrowService.cs" />
+    <Compile Include="IMemberService.cs" />
+    <Compile Include="MemberService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

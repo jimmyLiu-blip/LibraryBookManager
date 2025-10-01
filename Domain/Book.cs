@@ -8,7 +8,7 @@
         public int Quantity { get; set; }
         public int AvailableQuantity {  get; set; }
 
-        public Book(string title, string author, string isbn, int quantity,int availableQuantity)
+        public Book(string title, string author, string isbn, int quantity)
         {
             Title = title;
             Author = author;

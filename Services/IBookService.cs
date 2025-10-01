@@ -11,11 +11,9 @@ namespace Services
     {
         List<Book> GetAllBooks();
         void AddBook(string title, string author, string isbn, int quantity);
-
         List<Book> FindBooks(string isbn, string title);
-
         void UpdateQuantity(string isbn, int quantity);
-
         void DeleteBook(string isbn);
+
     }
 }

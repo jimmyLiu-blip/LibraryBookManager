@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BookRepository.cs" />
+    <Compile Include="BorrowRecordRepository.cs" />
     <Compile Include="IBookRepository.cs" />
     <Compile Include="IBorrowRecordRepository.cs" />
     <Compile Include="IMemberRepository.cs" />
