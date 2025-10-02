@@ -76,10 +76,12 @@ namespace Services
             }
 
             var member = _memberRepository.GetMemberById(memberId);
+            if (member == null)
+            {
+                throw new InvalidOperationException($"會員ID：{memberId}不存在，無法執行註銷");
+            }
 
-            var allmembers = _memberRepository.GetAllMembers();
-
-            allmembers.Remove(member);
+             _memberRepository.DeleteMember(memberId);
         }
     }
 }

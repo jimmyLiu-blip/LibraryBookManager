@@ -18,7 +18,7 @@ namespace UnitTest
         [InlineData("")]
         [InlineData("   ")]
         public void AddBook_ShouldThrowArgumentNullException_WhenTitleIsInvalid(string title)
-        { 
+        {
             var mockBookRepository = new Mock<IBookRepository>();
 
             var bookService = new BookService(mockBookRepository.Object);
@@ -85,9 +85,9 @@ namespace UnitTest
             bookService.AddBook(title, author, isbn, quantity);
 
             // Assert
-            mockBookRepository.Verify(repo => repo.AddBookToList(It.Is<Book>(b => 
-            b.ISBN   == isbn   &&
-            b.Title  == title  &&
+            mockBookRepository.Verify(repo => repo.AddBookToList(It.Is<Book>(b =>
+            b.ISBN == isbn &&
+            b.Title == title &&
             b.Author == author &&
             b.Quantity == quantity)), Times.Once);
         }
@@ -97,16 +97,16 @@ namespace UnitTest
         {
             var mockBookRepository = new Mock<IBookRepository>();
 
-            var existingBooks = new List<Book> { new Book("名偵探柯南","青山剛昌","123456777",1)};
+            var existingBooks = new List<Book> { new Book("名偵探柯南", "青山剛昌", "123456777", 1) };
 
             mockBookRepository.Setup(repo => repo.GetAllBooksFromList())
                               .Returns(existingBooks);
 
             var bookService = new BookService(mockBookRepository.Object);
 
-            Assert.Throws<InvalidOperationException>( () => bookService.AddBook("名偵探柯南", "青山剛昌", "123456777", 1));
+            Assert.Throws<InvalidOperationException>(() => bookService.AddBook("名偵探柯南", "青山剛昌", "123456777", 1));
 
-            mockBookRepository.Verify(repo => repo.AddBookToList(It.IsAny<Book>()), Times.Never);          
+            mockBookRepository.Verify(repo => repo.AddBookToList(It.IsAny<Book>()), Times.Never);
         }
 
         [Theory]
@@ -124,7 +124,7 @@ namespace UnitTest
 
         [Fact]
         public void DeletBook_ShouldDeleteBook_WhenBookDoesExist()
-        { 
+        {
             var mockBookRepository = new Mock<IBookRepository>();
 
             var bookToDelete = new Book("名偵探柯南", "青山剛昌", "123456777", 1);
@@ -151,12 +151,12 @@ namespace UnitTest
 
             Assert.Throws<InvalidOperationException>(() => bookService.DeleteBook("123456777"));
 
-            mockBookRepository.Verify(repo => repo.DeleteBookFromList(It.IsAny<Book>()),Times.Never);
+            mockBookRepository.Verify(repo => repo.DeleteBookFromList(It.IsAny<Book>()), Times.Never);
         }
 
         [Theory]
-        [InlineData(null,null)]
-        [InlineData("","")]
+        [InlineData(null, null)]
+        [InlineData("", "")]
         [InlineData("   ", "   ")]
         public void FindBooks_ShouldThrowArgumentNullException_WhenISBNAndTitleAreBothInvalid(string isbn, string title)
         {
@@ -186,7 +186,7 @@ namespace UnitTest
 
             var result = bookService.FindBooks(null, "名偵探");
 
-            Assert.Equal(3,result.Count);
+            Assert.Equal(3, result.Count);
             Assert.All(result, book => Assert.Contains("名偵探", book.Title));
         }
 
@@ -218,7 +218,7 @@ namespace UnitTest
         [InlineData("")]
         [InlineData("  ")]
         public void UpdateQuantity_ShouldThrowArgument_WhenISBNIsInvalid(string isbn)
-        { 
+        {
             var mockBookRepository = new Mock<IBookRepository>();
 
             var bookService = new BookService(mockBookRepository.Object);
@@ -237,7 +237,7 @@ namespace UnitTest
         }
 
         [Fact]
-        public void UpdateQuantity_ShouldUpdateQuantity_WhenBookDoesExis()
+        public void UpdateQuantity_ShouldUpdateQuantity_WhenBookDoesExist()
         {
             var mockBookRepository = new Mock<IBookRepository>();
 
@@ -254,7 +254,7 @@ namespace UnitTest
         }
 
         [Fact]
-        public void UpdateQuantity_ShouldThrowInvalidOperatiob_WhenBookDoesNotExis()
+        public void UpdateQuantity_ShouldThrowInvalidOperatiob_WhenBookDoesNotExist()
         {
             var mockBookRepository = new Mock<IBookRepository>();
 
@@ -264,6 +264,151 @@ namespace UnitTest
             var bookService = new BookService(mockBookRepository.Object);
 
             Assert.Throws<InvalidOperationException>(() => bookService.UpdateQuantity("123456789", 5));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void BorrowBook_ShouldThrowArgumentNullException_WhenMemberIdIsNull(string memberId)
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var borrowServicce = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            Assert.Throws<ArgumentNullException>(() => borrowServicce.BorrowBook(memberId, "123456789"));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void BorrowBook_ShouldThrowArgumentNullException_WhenISBNIsNull(string isbn)
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var borrowServicce = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            Assert.Throws<ArgumentNullException>(() => borrowServicce.BorrowBook("S001", isbn));
+        }
+
+        [Fact]
+        public void BorrowBook_ShouldThrowInvalidOperationException_WhenMemberDoesNotExist()
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            mockMemberRepository.Setup(repo => repo.GetMemberById("S001"))
+                                .Returns((Member)null);
+
+            var borrowService = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => borrowService.BorrowBook("S001", "123456789"));
+
+            Assert.Contains("S001", exception.Message);
+            Assert.Contains("不存在", exception.Message);
+        }
+
+        [Fact]
+        public void BorrowBook_ShouldThrowInvalidOperationException_WhenBookDoesNotExist()
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var member = new Member("S001", "Jimmy", MemberType.Regular);
+            mockMemberRepository.Setup(repo => repo.GetMemberById("S001"))
+                                .Returns(member);
+
+            mockBookRepository.Setup(repo => repo.GetBookISBN("123456789"))
+                              .Returns((Book)null);
+
+            var borrowService = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => borrowService.BorrowBook("S001", "123456789"));
+
+            Assert.Contains("123456789", exception.Message);
+            Assert.Contains("不存在", exception.Message);
+        }
+
+        [Fact]
+        public void BorrowBook_ShouldThrowInvalidOperationException_WhenAvailableQuantityisZero()
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var member = new Member("S001", "Jimmy", MemberType.Regular);
+            mockMemberRepository.Setup(repo => repo.GetMemberById("S001"))
+                                .Returns(member);
+
+            var book = new Book("航海王1", "尾田榮一郎", "123456788", 5);
+            book.AvailableQuantity = 0;
+            mockBookRepository.Setup(repo => repo.GetBookISBN("123456788"))
+                              .Returns(book);
+
+            var borrowService = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => borrowService.BorrowBook("S001", "123456788"));
+
+            Assert.Contains("沒有庫存", exception.Message);
+        }
+
+        [Fact]
+        public void BorrowBook_ShouldThrowInvalidOperationException_WhenMemberReachBorrowLimit()
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var member = new Member("S001", "Jimmy", MemberType.Regular);
+            member.CurrentBorrowCount = 5;
+            mockMemberRepository.Setup(repo => repo.GetMemberById("S001"))
+                                .Returns(member);
+
+            var book = new Book("航海王1", "尾田榮一郎", "123456788", 5);
+            mockBookRepository.Setup(repo => repo.GetBookISBN("123456788"))
+                              .Returns(book);
+
+            var borrowService = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => borrowService.BorrowBook("S001", "123456788"));
+
+            Assert.Contains("已達借閱上限", exception.Message);
+        }
+
+        [Fact]
+        public void BorrowBook_ShouldSucceed_WhenAllConditionsAreMet()
+        {
+            var mockBookRepository = new Mock<IBookRepository>();
+            var mockMemberRepository = new Mock<IMemberRepository>();
+            var mockBorrowRepository = new Mock<IBorrowRecordRepository>();
+
+            var member = new Member("S001", "Jimmy", MemberType.Regular);
+            mockMemberRepository.Setup(repo => repo.GetMemberById("S001"))
+                                .Returns(member);
+
+            var book = new Book("航海王1", "尾田榮一郎", "123456788", 5);
+            mockBookRepository.Setup(repo => repo.GetBookISBN("123456788"))
+                              .Returns(book);
+
+            var borrowService = new BorrowService(mockBookRepository.Object, mockMemberRepository.Object, mockBorrowRepository.Object);
+            
+            borrowService.BorrowBook(member.MemberId, book.ISBN);
+
+            mockBorrowRepository.Verify(repo => repo.AddRecord(It.IsAny<BorrowRecord>()), Times.Once);
+
+            Assert.Equal(4, book.AvailableQuantity);
+
+            Assert.Equal(1, member.CurrentBorrowCount);
+
+            mockMemberRepository.Verify(repo => repo.UpdateMember(member), Times.Once);
+
         }
     }
 }

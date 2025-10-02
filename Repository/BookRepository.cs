@@ -38,5 +38,10 @@ namespace Repository
         { 
             _bookList.Remove(book);
         }
+
+        public Book GetBookISBN(string isbn)
+        {
+            return _bookList.FirstOrDefault(b => b.ISBN == isbn);
+        }
     }
 }

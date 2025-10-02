@@ -36,7 +36,7 @@ namespace Services
                 throw new InvalidOperationException($"會員：{memberId}不存在");
             }
 
-            var book = _bookRepository.GetAllBooksFromList().FirstOrDefault(b => b.ISBN == isbn);
+            var book = _bookRepository.GetBookISBN(isbn);
             if (book == null)
             {
                 throw new InvalidOperationException($"ISBN：{isbn}的書籍不存在");
@@ -77,7 +77,7 @@ namespace Services
                 throw new InvalidOperationException($"會員：{memberId}不存在");
             }
 
-            var book = _bookRepository.GetAllBooksFromList().FirstOrDefault(b => b.ISBN == isbn);
+            var book = _bookRepository.GetBookISBN(isbn);
             if (book == null)
             {
                 throw new InvalidOperationException($"ISBN：{isbn}的書籍不存在");
@@ -88,8 +88,8 @@ namespace Services
             {
                 throw new InvalidOperationException($"{member.Name}沒有借閱ISBN：{isbn}的紀錄");
             }
-
             activeRecord.Return();
+
             book.AvailableQuantity++;
             member.CurrentBorrowCount--;
 

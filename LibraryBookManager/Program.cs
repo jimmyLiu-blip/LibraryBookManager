@@ -8,9 +8,13 @@ namespace LibraryBookManager
 {
     public class Program
     {
-        private static BookService _bookService = new BookService(new BookRepository());
-        private static MemberService _memberService = new MemberService(new MemberRepository());
-        private static BorrowService _borrowService = new BorrowService(new BookRepository(), new MemberRepository(), new BorrowRecordRepository());
+        private static readonly BookRepository _bookRepository = new BookRepository();
+        private static readonly MemberRepository _memberRepository = new MemberRepository();
+        private static readonly BorrowRecordRepository _borrowRecordRepository = new BorrowRecordRepository();
+
+        private static readonly BookService _bookService = new BookService(_bookRepository);
+        private static readonly MemberService _memberService = new MemberService(_memberRepository);
+        private static readonly BorrowService _borrowService = new BorrowService(_bookRepository, _memberRepository, _borrowRecordRepository);
         static void Main(string[] args)
         {
             bool exit = false;
@@ -61,13 +65,13 @@ namespace LibraryBookManager
                             BorrowBook();
                             break;
                         case "12":
-                            //ReturnBook();
+                            ReturnBook();
                             break;
                         case "13":
-                            //GetMemberBorrowHistory();
+                            GetMemberBorrowHistory();
                             break;
                         case "14":
-                            //GetActiveBorrows();
+                            GetActiveBorrows();
                             break;
                         case "15":
                             exit = true;
@@ -103,7 +107,7 @@ namespace LibraryBookManager
             Console.WriteLine("輸入 2，查詢書籍");
             Console.WriteLine("輸入 3，修改書籍數量");
             Console.WriteLine("輸入 4，刪除書籍");
-            Console.WriteLine("輸入 5，所有書籍清單");
+            Console.WriteLine("輸入 5，顯示所有書籍清單");
             Console.WriteLine("===============================");
             Console.WriteLine("輸入 6，註冊會員");
             Console.WriteLine("輸入 7，註銷會員");
@@ -518,6 +522,8 @@ namespace LibraryBookManager
 
             string memberId;
             string isbn;
+            Member member = null;
+            Book book = null;
 
             while (true)
             {
@@ -529,7 +535,19 @@ namespace LibraryBookManager
                     continue;
                 }
                 memberId = inputmemberId;
+                member = _memberService.GetMember(memberId);
 
+                if (member == null)
+                {
+                    Console.WriteLine($"不存在此會員ID：{memberId}");
+                    continue;
+                }
+
+                break;
+            }
+
+            while (true)
+            {
                 Console.Write("請輸入要借閱書籍的ISBN：");
                 var inputisbn = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(inputisbn))
@@ -538,20 +556,15 @@ namespace LibraryBookManager
                     continue;
                 }
                 isbn = inputisbn;
+                book = _bookService.GetBookByISBN(isbn);
+                if (book == null)
+                {
+                    Console.WriteLine($"此書籍ISBN：{isbn}不存在");
+                    continue;
+                }
                 break;
             }
-            var member = _memberService.GetMember(memberId);
-            if (member == null)
-            {
-                Console.WriteLine($"不存在此會員ID：{memberId}");
-                return;
-            }
-            var book = _bookService.GetBookByISBN(isbn);
-            if (book == null)
-            {
-                Console.WriteLine($"此書籍ISBN：{isbn}不存在");
-                return;
-            }
+
             if (book.AvailableQuantity <= 0)
             {
                 Console.WriteLine($"此書籍ISBN：{isbn}目前沒有庫存可以出借");
@@ -563,8 +576,159 @@ namespace LibraryBookManager
                 return;
             }
 
-            _borrowService.BorrowBook(memberId, isbn);
-            Console.WriteLine($"借閱書籍成功!會員姓名：{member.Name},成功借閱書籍：{book.Title},ISBN：{isbn}");
+            try
+            {
+                _borrowService.BorrowBook(memberId, isbn);
+                Console.WriteLine($"借閱書籍成功!會員姓名：{member.Name},成功借閱書籍：{book.Title},ISBN：{isbn}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"借閱失敗!原因：{ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"發生未知錯誤造成借閱失敗!原因：{ex.Message}");
+            }
+
+        }
+
+        private static void ReturnBook()
+        {
+            Console.WriteLine("===還書服務===");
+
+            string memberId;
+            string isbn;
+            Member member = null;
+            Book book = null;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+
+                member = _memberService.GetMember(memberId);
+                if (member == null)
+                {
+                    Console.WriteLine($"此會員ID:{memberId}不存在");
+                    continue;
+                }
+                break;
+            }
+
+            while (true)
+            {
+                Console.Write("請輸入你要歸還書籍的ISBN：");
+                var inputisbn = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputisbn))
+                {
+                    Console.WriteLine("不可沒有輸入歸還書籍的ISBN");
+                    continue;
+                }
+                isbn = inputisbn;
+
+                book = _bookService.GetBookByISBN(isbn);
+                if (book == null)
+                {
+                    Console.WriteLine($"此ISBN：{isbn}書籍不存在");
+                    continue;
+                }
+                break;
+            }
+            try
+            {
+                _borrowService.ReturnBook(memberId, isbn);
+                Console.WriteLine($"還書成功!會員姓名：{member.Name},還書書名：{book.Title},ISBN：{isbn}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"還書失敗!原因：{ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"發生未知錯誤造成還書失敗!原因：{ex.Message}");
+            }
+            
+        }
+
+        private static void GetMemberBorrowHistory()
+        {
+            Console.WriteLine("===取得會員歷史借閱紀錄===");
+
+            string memberId;
+            Member member;
+
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+
+                member = _memberService.GetMember(memberId);
+                if (member == null)
+                {
+                    Console.WriteLine($"此會員ID：{memberId}不存在");
+                    continue;
+                }
+                break;
+            }
+            
+            var allBorrowsHistory = _borrowService.GetMemberBorrowHistory(memberId);
+            if (allBorrowsHistory == null ||!allBorrowsHistory.Any())
+            {
+                Console.WriteLine($"目前{member.Name}沒有任何借書紀錄");
+                return;
+            }
+            foreach (var borrow in allBorrowsHistory)
+            {
+                Console.WriteLine($"借閱ID：{borrow.RecordId}，會員ID：{memberId}，借閱書籍ISBN：{borrow.ISBN}，借閱時間：{borrow.BorrowDate}，歸還時間：{borrow.ReturnDate}，歸還狀態：{(borrow.IsReturned ? "已歸還":"未歸還")}");
+            }
+        }
+
+        private static void GetActiveBorrows()
+        {
+            Console.WriteLine("===取得會員尚未歸還書籍紀錄===");
+
+            string memberId;
+            Member member;
+            while (true)
+            {
+                Console.Write("請輸入你的會員ID：");
+                var inputmemberId = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(inputmemberId))
+                {
+                    Console.WriteLine("不可沒有輸入會員ID");
+                    continue;
+                }
+                memberId = inputmemberId;
+
+                member = _memberService.GetMember(memberId);
+                if (member == null)
+                {
+                    Console.WriteLine($"此會員ID：{memberId}不存在會員");
+                }
+                break;
+            }
+            var allBorrows = _borrowService.GetActiveBorrows(memberId);
+            if (allBorrows == null || !allBorrows.Any())
+            {
+                Console.WriteLine($"會員姓名：{member.Name}目前沒有尚未歸還的書籍");
+                return;
+            }
+            foreach (var borrow in allBorrows)
+            {
+                Console.WriteLine($"借閱ID：{borrow.RecordId}，會員ID：{memberId}，借閱書籍ISBN：{borrow.ISBN}，借閱時間：{borrow.BorrowDate}");
+            }
 
         }
     }
